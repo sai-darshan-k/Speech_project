@@ -8,132 +8,131 @@
 </head>
 <style>
     /* Reset CSS */
-body, h1, h2, h3, p, ul, li, a {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+    body, h1, h2, h3, p, ul, li, a {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-body {
-    font-family: 'Arial', sans-serif;
-    line-height: 1.8;
-    background: url('static/1.jpg') no-repeat center center fixed;
-    background-size: cover;
-    background-position: center -130px;
-    color: white; /* Ensures text is visible on the background */
-}
+    body {
+        font-family: 'Arial', sans-serif;
+        line-height: 1.8;
+        background: url('static/1.jpg') no-repeat center center fixed;
+        background-size: cover;
+        background-position: center -130px;
+        color: white; /* Ensures text is visible on the background */
+    }
 
-header {
-    background: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-    text-align: center;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
+    header {
+        background: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        text-align: center;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
 
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-.nav-links {
-    list-style: none;
-    display: flex;
-    gap: 20px;
-}
+    .nav-links {
+        list-style: none;
+        display: flex;
+        gap: 20px;
+    }
 
-.nav-links a {
-    text-decoration: none;
-    color: white;
-    font-weight: bold;
-}
+    .nav-links a {
+        text-decoration: none;
+        color: white;
+        font-weight: bold;
+    }
 
-.hero {
-    background: url('https://source.unsplash.com/1600x900/?technology,speech') no-repeat center/cover;
-    color: white;
-    text-align: center;
-    padding: 100px 20px;
-}
+    .hero {
+        background: url('https://source.unsplash.com/1600x900/?technology,speech') no-repeat center/cover;
+        color: white;
+        text-align: center;
+        padding: 100px 20px;
+    }
 
-.hero-text {
-    background: rgba(0, 0, 0, 0.6);
-    display: inline-block;
-    padding: 20px;
-    border-radius: 10px;
-}
+    .hero-text {
+        background: rgba(0, 0, 0, 0.6);
+        display: inline-block;
+        padding: 20px;
+        border-radius: 10px;
+    }
 
-.features {
-    text-align: center;
-    padding: 50px 20px;
-    background-color: #f4f4f4;
-}
+    .features {
+        text-align: center;
+        padding: 50px 20px;
+        background-color: #f4f4f4;
+    }
 
-.features h2 {
-    margin-bottom: 20px;
-    font-size: 2.5rem;
-    color: #333;
-}
+    .features h2 {
+        margin-bottom: 20px;
+        font-size: 2.5rem;
+        color: #333;
+    }
 
-.card-container {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-}
+    .card-container {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
 
-.card {
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    padding: 20px;
-    width: 300px;
-    text-align: center;
-}
+    .card {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        padding: 20px;
+        width: 300px;
+        text-align: center;
+    }
 
-.card h3 {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
-    color: #4CAF50;
-}
+    .card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+        color: #4CAF50;
+    }
 
-.card p {
-    color: #555;
-    margin-bottom: 20px;
-}
+    .card p {
+        color: #555;
+        margin-bottom: 20px;
+    }
 
-.card button {
-    background: #4CAF50;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-}
+    .card button {
+        background: #4CAF50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+    }
 
-.card button:hover {
-    background: #45a049;
-}
+    .card button:hover {
+        background: #45a049;
+    }
 
-footer {
-    background: #333;
-    color: white;
-    text-align: center;
-    padding: 20px;
-}
+    footer {
+        background: #333;
+        color: white;
+        text-align: center;
+        padding: 20px;
+    }
 
-footer p {
-    margin: 5px 0;
-}
+    footer p {
+        margin: 5px 0;
+    }
 
-footer h3 {
-    margin-bottom: 10px;
-}
-
+    footer h3 {
+        margin-bottom: 10px;
+    }
 </style>
 <body>
     <header>
@@ -168,6 +167,13 @@ footer h3 {
                 <h3>Know the Speech Sentiment</h3>
                 <p>Determine whether speech conveys positive, negative, or neutral sentiment.</p>
                 <a href="/sentiment">
+                    <button>Explore</button>
+                </a>
+            </div>
+            <div class="card">
+                <h3>Remove fillers for speech clarity</h3>
+                <p>Identify common fillers such as "um," "uh," or "like" to improve speaking habits.</p>
+                <a href="/filler">
                     <button>Explore</button>
                 </a>
             </div>
