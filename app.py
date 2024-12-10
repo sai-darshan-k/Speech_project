@@ -63,6 +63,10 @@ def emotion():
 def sentiment():
     return render_template('sentiment.html')
 
+@app.route('/filler')
+def filler():
+    return render_template('filler.html')
+
 # Route to handle file upload and prediction
 @app.route('/predict_audio', methods=['POST'])
 def predict_audio():
@@ -126,6 +130,64 @@ def convert_speech_to_text(file_path):
         audio_data = recognizer.record(source)
         text = recognizer.recognize_google(audio_data)  # Using Google Web Speech API
     return text
+
+@app.route('/filter_filler', methods=['POST'])
+def filter_filler():
+    # Check if file is present in the request
+    if 'audio' not in request.files:
+        return jsonify({"error": "No audio part in the request."}), 400
+
+    audio_file = request.files['audio']
+    if audio_file.filename == '':
+        return jsonify({"error": "No selected audio file."}), 400
+
+    # Generate a unique filename to prevent conflicts
+    unique_id = uuid.uuid4().hex
+    file_ext = os.path.splitext(audio_file.filename)[1].lower()
+    input_filename = f"{unique_id}{file_ext}"
+    input_path = os.path.join(UPLOAD_FOLDER, input_filename)
+    wav_path = os.path.join(UPLOAD_FOLDER, f"{unique_id}.wav")
+
+    try:
+        # Save the uploaded file to the 'uploads' folder
+        audio_file.save(input_path)
+
+        # If the file is not already a WAV, convert it
+        if file_ext != '.wav':
+            audio = AudioSegment.from_file(input_path)
+            audio.export(wav_path, format="wav")
+            os.remove(input_path)
+        else:
+            wav_path = input_path
+
+        # Convert speech to text
+        text = convert_speech_to_text(wav_path)
+
+        # Filter filler words
+        filtered_text = filter_filler_words(text)
+
+        # Remove the temporary WAV file
+        os.remove(wav_path)
+
+        # Return the result as a JSON response
+        return jsonify({"original_text": text, "filtered_text": filtered_text})
+
+    except Exception as e:
+        # Clean up files in case of errors
+        if os.path.exists(input_path):
+            os.remove(input_path)
+        if 'wav_path' in locals() and os.path.exists(wav_path):
+            os.remove(wav_path)
+        return jsonify({"error": str(e)}), 500
+
+
+# Function to filter filler words from text
+def filter_filler_words(text):
+    filler_words = {"uh", "um", "like", "you know", "er", "ah", "hmm"}
+    words = text.split()
+    filtered_words = [word for word in words if word.lower() not in filler_words]
+    return " ".join(filtered_words)
+
 
 # Function to analyze sentiment
 def analyze_sentiment(text):

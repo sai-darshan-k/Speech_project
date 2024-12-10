@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remove Filler Words</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            padding: 10px 15px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        p {
+            margin: 10px 0;
+        }
+
+        .result {
+            margin-top: 20px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Remove Filler Words from Speech</h1>
+    </header>
+    <main>
+        <div class="container">
+            <h2>Record and Process Speech</h2>
+            <button id="startButton" onclick="startRecording()">Start Recording</button>
+            <button id="stopButton" onclick="stopRecording()" style="display: none;">Stop Recording</button>
+            <p id="status">Status: Ready</p>
+            <div class="result">
+                <h3>Results:</h3>
+                <p><strong>Original Phrase:</strong> <span id="originalPhrase"></span></p>
+                <p><strong>Updated Phrase:</strong> <span id="updatedPhrase"></span></p>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 SpeechInsights. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const fillerWords = ["um", "uh", "like", "you know", "i mean", "sort of", 
+    "kind of", "actually", "basically", "literally", 
+    "just", "so", "well", "er", "ah", "hmm", 
+    "right", "okay", "alright", "you see", "you know what I mean"]
+        let recognition;
+        let isRecording = false;
+
+        // Initialize Speech Recognition
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = function() {
+                document.getElementById('status').innerText = 'Recording...';
+            };
+
+            recognition.onend = function() {
+                document.getElementById('status').innerText = 'Recording stopped.';
+                isRecording = false;
+                document.getElementById('startButton').style.display = 'block';
+                document.getElementById('stopButton').style.display = 'none';
+            };
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('originalPhrase').innerText = transcript;
+
+                // Remove filler words
+                const updatedText = transcript.split(" ").filter(word => !fillerWords.includes(word.toLowerCase())).join(" ");
+                document.getElementById('updatedPhrase').innerText = updatedText;
+            };
+        } else {
+            alert("Speech Recognition API is not supported in this browser. Please use Chrome or Edge.");
+        }
+
+        // Start Recording
+        function startRecording() {
+            if (!isRecording) {
+                recognition.start();
+                isRecording = true;
+                document.getElementById('startButton').style.display = 'none';
+                document.getElementById('stopButton').style.display = 'block';
+            }
+        }
+
+        // Stop Recording
+        function stopRecording() {
+            if (isRecording) {
+                recognition.stop();
+            }
+        }
+    </script>
+</body>
+</html>
