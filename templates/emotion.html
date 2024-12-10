@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Prediction</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+    background: url('static/e1.jpg') no-repeat center center fixed;
+    background-size: cover;
+        }
+        header {
+            background-color: #2c322d;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0;
+        }
+        main {
+            padding: 20px;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+        }
+        section {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 15px;
+            background: #4CAF50;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        footer {
+            text-align: center;
+            padding: 10px 0;
+            background: #333;
+            color: #fff;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        p {
+            margin-top: 10px;
+            font-size: 1.1em;
+        }
+        .recording-controls {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Emotion Prediction from Audio</h1>
+        <p>Record or upload audio to predict emotions!</p>
+    </header>
+    <main>
+        <div class="container">
+            <section>
+                <h2>Real-Time Recording</h2>
+                <div class="recording-controls">
+                    <button id="startRecording" onclick="startRecording()">Start Recording</button>
+                    <button id="stopRecording" onclick="stopRecording()" style="display: none;">Stop Recording</button>
+                </div>
+                <button id="predictRecording" onclick="predictAudio()" style="display: none;">Predict Emotion</button>
+                <p id="status">Status: Ready</p>
+                <p id="recordPrediction"></p>
+            </section>
+            <section>
+                <h2>Upload Audio File</h2>
+                <input type="file" id="audioFile" accept="audio/*">
+                <button onclick="uploadAudio()">Upload and Predict</button>
+                <p id="uploadPrediction"></p>
+            </section>
+            <button onclick="goBack()">Back</button>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 Emotion Prediction App</p>
+    </footer>
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        let audioBlob = null;
+
+        // Start recording audio
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+                audioChunks = [];
+                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                mediaRecorder.onstop = () => {
+                    audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    document.getElementById('status').innerText = 'Recording stopped. Ready to predict.';
+                    document.getElementById('predictRecording').style.display = 'block';
+                    document.getElementById('startRecording').style.display = 'block';
+                    document.getElementById('stopRecording').style.display = 'none';
+                };
+                mediaRecorder.start();
+                document.getElementById('status').innerText = 'Recording...';
+                document.getElementById('startRecording').style.display = 'none';
+                document.getElementById('stopRecording').style.display = 'block';
+            } catch (error) {
+                console.error("Error accessing microphone:", error);
+                alert("Microphone access is required. Please check your browser and system permissions.");
+            }
+        }
+
+        // Stop recording audio
+        function stopRecording() {
+            if (mediaRecorder) {
+                mediaRecorder.stop();
+                document.getElementById('status').innerText = 'Stopping...';
+                document.getElementById('stopRecording').style.display = 'none';
+            }
+        }
+
+        // Predict emotion from recorded audio
+        function predictAudio() {
+            if (!audioBlob) {
+                alert("No audio recorded.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('audio', audioBlob, 'recorded_audio.webm');
+
+            fetch('/predict_audio', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.emotion) {
+                    document.getElementById('recordPrediction').innerText = `Predicted Emotion: ${data.emotion}`;
+                } else if (data.error) {
+                    document.getElementById('recordPrediction').innerText = `Error: ${data.error}`;
+                }
+                
+                // Reset recording controls
+                document.getElementById('predictRecording').style.display = 'none';
+                document.getElementById('startRecording').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("There was an error with the prediction.");
+                
+                // Reset recording controls
+                document.getElementById('predictRecording').style.display = 'none';
+                document.getElementById('startRecording').style.display = 'block';
+            });
+        }
+
+        // Upload and predict audio from file
+        function uploadAudio() {
+            const file = document.getElementById('audioFile').files[0];
+            if (!file) {
+                alert('Please select an audio file.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('audio', file);
+
+            fetch('/predict_audio', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.emotion) {
+                    document.getElementById('uploadPrediction').innerText = `Predicted Emotion: ${data.emotion}`;
+                } else if (data.error) {
+                    document.getElementById('uploadPrediction').innerText = `Error: ${data.error}`;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("There was an error with the prediction.");
+            });
+        }
+            // Navigate back to the home page
+        function goBack() {
+            window.location.href = '/';
+        }
+
+    </script>
+</body>
+</html>

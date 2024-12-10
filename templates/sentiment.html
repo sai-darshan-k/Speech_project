@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Prediction</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            background: url('static/s3.jpg');
+            background-size: cover;
+        }
+        header {
+            background-color: #383c38;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0;
+        }
+        main {
+            padding: 20px;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+        }
+        .positive {
+            background-color: yellow;
+            color: black;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .negative {
+            background-color: red;
+            color: white;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        section {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 15px;
+            background: #4CAF50;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        footer {
+            text-align: center;
+            padding: 10px 0;
+            background: #333;
+            color: #fff;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        p {
+            margin-top: 10px;
+            font-size: 1.1em;
+        }
+        .recording-controls {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Sentiment Prediction from Audio</h1>
+        <p>Record or upload audio to predict sentiment!</p>
+    </header>
+    <main>
+        <div class="container">
+            <section>
+                <h2>Real-Time Recording</h2>
+                <div class="recording-controls">
+                    <button id="startRecording" onclick="startRecording()">Start Recording</button>
+                    <button id="stopRecording" onclick="stopRecording()" style="display: none;">Stop Recording</button>
+                </div>
+                <button id="predictRecording" onclick="predictSentiment()" style="display: none;">Predict Sentiment</button>
+                <p id="status">Status: Ready</p>
+                <p id="recordPrediction"></p>
+            </section>
+            <section>
+                <h2>Upload Audio File</h2>
+                <input type="file" id="audioFile" accept="audio/*">
+                <button onclick="uploadSentimentAudio()">Upload and Predict</button>
+                <p id="uploadPrediction"></p>
+            </section>
+            <button onclick="goBack()">Back</button>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 Sentiment Prediction App</p>
+    </footer>
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        let audioBlob = null;
+
+        // Start recording audio
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+                audioChunks = [];
+                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                mediaRecorder.onstop = () => {
+                    audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    document.getElementById('status').innerText = 'Recording stopped. Ready to predict.';
+                    document.getElementById('predictRecording').style.display = 'block';
+                    document.getElementById('startRecording').style.display = 'block';
+                    document.getElementById('stopRecording').style.display = 'none';
+                };
+                mediaRecorder.start();
+                document.getElementById('status').innerText = 'Recording...';
+                document.getElementById('startRecording').style.display = 'none';
+                document.getElementById('stopRecording').style.display = 'block';
+            } catch (error) {
+                console.error("Error accessing microphone:", error);
+                alert("Microphone access is required. Please check your browser and system permissions.");
+            }
+        }
+
+        // Stop recording audio
+        function stopRecording() {
+            if (mediaRecorder) {
+                mediaRecorder.stop();
+                document.getElementById('status').innerText = 'Stopping...';
+                document.getElementById('stopRecording').style.display = 'none';
+            }
+        }
+
+        // Predict sentiment from recorded audio
+        function predictSentiment() {
+            if (!audioBlob) {
+                alert("No audio recorded.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('audio', audioBlob, 'recorded_audio.webm');
+
+            fetch('/predict_sentiment', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.text && data.sentiment) {
+                    document.getElementById('recordPrediction').innerHTML = `
+                        <p>Transcribed Text: ${data.text}</p>
+                        <p>Predicted Sentiment: ${data.sentiment}</p>
+                    `;
+                } else if (data.error) {
+                    document.getElementById('recordPrediction').innerText = `Error: ${data.error}`;
+                }
+
+                // Reset recording controls
+                document.getElementById('predictRecording').style.display = 'none';
+                document.getElementById('startRecording').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("There was an error with the prediction.");
+            });
+        }
+
+        // Upload and predict sentiment from file
+        function uploadSentimentAudio() {
+            const file = document.getElementById('audioFile').files[0];
+            if (!file) {
+                alert('Please select an audio file.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('audio', file);
+
+            fetch('/predict_sentiment', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.text && data.sentiment) {
+                    document.getElementById('uploadPrediction').innerHTML = `
+                        <p>Transcribed Text: ${data.text}</p>
+                        <p>Predicted Sentiment: ${data.sentiment}</p>
+                    `;
+                } else if (data.error) {
+                    document.getElementById('uploadPrediction').innerText = `Error: ${data.error}`;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("There was an error with the prediction.");
+            });
+        }
+
+        // Navigate back to the home page
+        function goBack() {
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>

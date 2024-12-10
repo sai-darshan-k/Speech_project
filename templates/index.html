@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech Project</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+    /* Reset CSS */
+body, h1, h2, h3, p, ul, li, a {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.8;
+    background: url('static/1.jpg') no-repeat center center fixed;
+    background-size: cover;
+    background-position: center -130px;
+    color: white; /* Ensures text is visible on the background */
+}
+
+header {
+    background: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+}
+
+.hero {
+    background: url('https://source.unsplash.com/1600x900/?technology,speech') no-repeat center/cover;
+    color: white;
+    text-align: center;
+    padding: 100px 20px;
+}
+
+.hero-text {
+    background: rgba(0, 0, 0, 0.6);
+    display: inline-block;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.features {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: #f4f4f4;
+}
+
+.features h2 {
+    margin-bottom: 20px;
+    font-size: 2.5rem;
+    color: #333;
+}
+
+.card-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    width: 300px;
+    text-align: center;
+}
+
+.card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #4CAF50;
+}
+
+.card p {
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.card button {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.card button:hover {
+    background: #45a049;
+}
+
+footer {
+    background: #333;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+footer p {
+    margin: 5px 0;
+}
+
+footer h3 {
+    margin-bottom: 10px;
+}
+
+</style>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">Articulate</div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact Us</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="home" class="hero">
+        <div class="hero-text">
+            <h1>Welcome to Articulate</h1>
+            <p>Uncover the emotions and sentiments in speech with advanced AI.</p>
+        </div>
+    </section>
+
+    <section class="features">
+        <h2>Our Features</h2>
+        <div class="card-container">
+            <div class="card">
+                <h3>Get Speech Emotions</h3>
+                <p>Analyze speech recordings to identify emotions like happiness, sadness, anger, and more.</p>
+                <a href="/emotion">
+                    <button>Explore</button>
+                </a>
+            </div>
+            <div class="card">
+                <h3>Know the Speech Sentiment</h3>
+                <p>Determine whether speech conveys positive, negative, or neutral sentiment.</p>
+                <a href="/sentiment">
+                    <button>Explore</button>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer id="contact">
+        <div class="footer-content">
+            <h3>Contact Us</h3>
+            <p>Email: saidarshan9632@gmail.com</p>
+            <p>Phone: +91 9632568029</p>
+            <p>&copy; 2024 SpeechInsights. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
