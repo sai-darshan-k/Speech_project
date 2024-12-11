@@ -1,22 +1,88 @@
-from flask import Flask, render_template, request, jsonify
-import os
-import pickle
-import numpy as np
-import librosa
-import soundfile as sf
+from flask import Flask, render_template, request, jsonify, send_from_directory
+import torchvision.transforms as transforms
 from sklearn.decomposition import PCA
 from textblob import TextBlob
 import speech_recognition as sr
 from pydub import AudioSegment
+import torch.nn as nn
+from gtts import gTTS
+import soundfile as sf
+import pickle
+import librosa
+import numpy as np
+import time
 import uuid
+import torch
+import cv2
+import os
+
+class SignLanguageCNN(nn.Module):
+    def __init__(self, num_classes):
+        super(SignLanguageCNN, self).__init__()
+        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
+        self.conv3 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
+        self.pool = nn.MaxPool2d(2, 2)
+        self.fc1 = nn.Linear(128 * 8 * 8, 512)
+        self.fc2 = nn.Linear(512, num_classes)
+        self.dropout = nn.Dropout(0.5)
+        self.relu = nn.ReLU()
+
+    def forward(self, x):
+        x = self.pool(self.relu(self.conv1(x)))
+        x = self.pool(self.relu(self.conv2(x)))
+        x = self.pool(self.relu(self.conv3(x)))
+        x = x.view(-1, 128 * 8 * 8)
+        x = self.relu(self.fc1(x))
+        x = self.dropout(x)
+        x = self.fc2(x)
+        return x
+
+# Load model and categories
+model_path = "indian_sign_language_model.pth"
+categories = [
+    '1', '2', '3', '4', '5', '6', '7', '8', '9',
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+    'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+]
+num_classes = len(categories)
+
+# Instantiate and load the model
+# Sign Language CNN model
+sign_language_model = SignLanguageCNN(num_classes=num_classes)
+sign_language_model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+sign_language_model.eval()
+
+# Transformations
+transform = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize((0.5,), (0.5,))
+])
 
 app = Flask(__name__)
 
 #FFmpeg converter path for PyDub
 AudioSegment.converter = "C:/Users/saida/OneDrive/Desktop/Projects/SPR_Project/ffmpeg/bin/ffmpeg.exe"
 UPLOAD_FOLDER = 'uploads'
+AUDIO_FOLDER = 'static/audio'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(AUDIO_FOLDER, exist_ok=True)
 
+# Helper function to recognize a hand sign
+def recognize_hand_sign(image_path):
+    img = cv2.imread(image_path)
+    if img is None:
+        raise ValueError(f"Image at path {image_path} could not be loaded.")
+    
+    img = cv2.resize(img, (64, 64))
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img = transform(img).unsqueeze(0)
+
+    with torch.no_grad():
+        outputs = sign_language_model(img)
+        _, predicted = torch.max(outputs, 1)
+        return categories[predicted.item()]
+    
 #trained model and PCA transformer
 with open('best_mlp_model.pkl', 'rb') as f:
     model = pickle.load(f)
@@ -66,6 +132,72 @@ def sentiment():
 @app.route('/filler')
 def filler():
     return render_template('filler.html')
+
+@app.route("/sign")
+def sign():
+    return render_template("sign.html")
+
+import time
+import os
+
+@app.route("/upload", methods=["POST"])
+def upload_file():
+    if "files" not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
+
+    files = request.files.getlist("files")
+    recognized_chars = []
+
+    # Process each file (i.e., hand sign image)
+    for file in files:
+        file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+        file.save(file_path)
+
+        # Recognize the hand sign from the uploaded image
+        recognized_char = recognize_hand_sign(file_path)
+        recognized_chars.append(recognized_char)
+
+    # Form the word from the recognized characters
+    word = ''.join(recognized_chars)
+
+    # Generate TTS (Text-to-Speech) output with dynamic filename
+    timestamp = str(int(time.time()))  # Using timestamp for unique filename
+    tts_path = os.path.join(AUDIO_FOLDER, f"{timestamp}_output.mp3")
+    tts = gTTS(text=word, lang="en")
+    tts.save(tts_path)
+
+    # Generate the full path to the audio file
+    audio_url = f"/static/audio/{os.path.basename(tts_path)}"
+
+    return jsonify({
+        "prediction": word,
+        "audio": audio_url
+    })
+
+@app.route("/camera", methods=["POST"])
+def camera_detection():
+    if "file" not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
+
+    file = request.files["file"]
+    file_path = os.path.join(UPLOAD_FOLDER, "camera_capture.jpg")
+    file.save(file_path)
+
+    recognized_char = recognize_hand_sign(file_path)
+    if recognized_char is None:
+        return jsonify({"error": "Prediction failed"}), 500
+
+    # Generate TTS (Text-to-Speech) output with dynamic filename
+    timestamp = str(int(time.time()))  # Using timestamp for unique filename
+    tts_path = os.path.join(AUDIO_FOLDER, f"{timestamp}_output.mp3")
+    tts = gTTS(text=recognized_char, lang="en")
+    tts.save(tts_path)
+
+    return jsonify({"prediction": recognized_char, "audio": tts_path})
+
+@app.route("/static/audio/<filename>")
+def serve_audio(filename):
+    return send_from_directory(AUDIO_FOLDER, filename)
 
 # Route to handle file upload and prediction
 @app.route('/predict_audio', methods=['POST'])
@@ -183,7 +315,7 @@ def filter_filler():
 
 # Function to filter filler words from text
 def filter_filler_words(text):
-    filler_words = {"uh", "um", "like", "you know", "er", "ah", "hmm"}
+    filler_words = {"um", "uh", "like", "you know", "actually", "basically", "seriously", "I mean", "so", "right", "well", "literally", "kind of", "sort of", "err", "uhh", "okay"}
     words = text.split()
     filtered_words = [word for word in words if word.lower() not in filler_words]
     return " ".join(filtered_words)
@@ -265,7 +397,6 @@ def predict_sentiment():
         if 'wav_path' in locals() and os.path.exists(wav_path):
             os.remove(wav_path)
         return jsonify({"error": str(e)}), 500
-
 
 if __name__ == "__main__":
     app.run(debug=True)

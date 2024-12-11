@@ -13,25 +13,69 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f7f6;
-            color: #333;
-            background: url('static/s3.jpg');
+            background: url('static/s3.jpg') no-repeat center center fixed;
             background-size: cover;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
         }
         header {
             background-color: #383c38;
             color: white;
             padding: 20px;
             text-align: center;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            width: 80%;
         }
         header h1 {
             margin: 0;
         }
-        main {
-            padding: 20px;
-        }
         .container {
-            width: 80%;
-            margin: 0 auto;
+            width: 90%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        section {
+            margin-bottom: 20px;
+        }
+        h2 {
+            margin-bottom: 10px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        input[type="file"] {
+            width: 100%;
+            margin-top: 10px;
+        }
+        p {
+            margin: 10px 0;
+            font-size: 1.1em;
+        }
+        footer {
+            margin-top: 20px;
+            text-align: center;
+            color: white;
+            font-size: 0.9em;
         }
         .positive {
             background-color: yellow;
@@ -45,47 +89,6 @@
             padding: 2px 4px;
             border-radius: 3px;
         }
-        section {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-        button {
-            padding: 10px 15px;
-            background: #4CAF50;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            margin: 5px;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background: #45a049;
-        }
-        button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-        footer {
-            text-align: center;
-            padding: 10px 0;
-            background: #333;
-            color: #fff;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-        }
-        p {
-            margin-top: 10px;
-            font-size: 1.1em;
-        }
-        .recording-controls {
-            display: flex;
-            gap: 10px;
-        }
     </style>
 </head>
 <body>
@@ -93,37 +96,28 @@
         <h1>Sentiment Prediction from Audio</h1>
         <p>Record or upload audio to predict sentiment!</p>
     </header>
-    <main>
-        <div class="container">
-            <section>
-                <h2>Real-Time Recording</h2>
-                <div class="recording-controls">
-                    <button id="startRecording" onclick="startRecording()">Start Recording</button>
-                    <button id="stopRecording" onclick="stopRecording()" style="display: none;">Stop Recording</button>
-                </div>
-                <button id="predictRecording" onclick="predictSentiment()" style="display: none;">Predict Sentiment</button>
-                <p id="status">Status: Ready</p>
-                <p id="recordPrediction"></p>
-            </section>
-            <section>
-                <h2>Upload Audio File</h2>
-                <input type="file" id="audioFile" accept="audio/*">
-                <button onclick="uploadSentimentAudio()">Upload and Predict</button>
-                <p id="uploadPrediction"></p>
-            </section>
-            <button onclick="goBack()">Back</button>
-        </div>
-    </main>
+    <div class="container">
+        <section>
+            <h2>Real-Time Recording</h2>
+            <button id="startRecording" onclick="startRecording()">Start Recording</button>
+            <button id="stopRecording" onclick="stopRecording()" style="display: none;">Stop Recording</button>
+            <button id="predictRecording" onclick="predictSentiment()" style="display: none;">Predict Sentiment</button>
+            <p id="status">Status: Ready</p>
+            <p id="recordPrediction"></p>
+        </section>
+        <section>
+            <h2>Upload Audio File</h2>
+            <input type="file" id="audioFile" accept="audio/*">
+            <button onclick="uploadSentimentAudio()">Upload and Predict</button>
+            <p id="uploadPrediction"></p>
+        </section>
+        <button onclick="goBack()">Back</button>
+    </div>
     <footer>
         <p>&copy; 2024 Sentiment Prediction App</p>
     </footer>
     <script>
-        let mediaRecorder;
-        let audioChunks = [];
-        let audioBlob = null;
-
-        // Start recording audio
-        async function startRecording() {
+         async function startRecording() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
