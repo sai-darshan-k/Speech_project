@@ -1,11 +1,12 @@
-![image](https://github.com/user-attachments/assets/cb9151a3-bdec-434a-91da-9332fe94dfd5)Here’s a well-structured README file for your GitHub repository:
-
 ---
 
 # ARTICULATE: A Multipurpose AI Speech Companion
 
 Articulate is an AI-powered speech companion designed to assist users in improving their communication skills, emotional well-being, and daily productivity. This project integrates advanced technologies such as speech recognition, emotion detection, and real-time feedback systems to create a comprehensive tool for enhancing speech clarity, fluency, and confidence.
-![image](https://github.com/user-attachments/assets/bf7caecc-9c9c-48e4-a6ac-204e65134c40)
+
+
+![image](https://github.com/user-attachments/assets/cd142782-a820-4c05-980d-da1bbebaa78a)
+
 
 
 
@@ -44,36 +45,41 @@ Articulate is an AI-powered speech companion designed to assist users in improvi
 2. **Dimensionality Reduction**: Applies Principal Component Analysis (PCA) to reduce feature dimensions before classification.
 3. **Classification**: Utilizes a pre-trained Multi-Layer Perceptron (MLP) model to predict emotions with an accuracy of 83%.
 
-![image](https://github.com/user-attachments/assets/493d6195-8457-4e68-9a53-f1780d1bf654)
+![image](https://github.com/user-attachments/assets/e07bf813-f82f-42dc-b8c9-e5303485892c)
+
 
 
 ### Sentiment Analysis
 1. **Speech-to-Text Conversion**: Converts audio to text using the Google Web Speech API.
 2. **Text Analysis**: Employs TextBlob for polarity analysis, classifying sentiment as Positive, Negative, or Neutral.
 
-![image](https://github.com/user-attachments/assets/5ad6c5e8-203f-4867-9154-0d8145236374)
+![image](https://github.com/user-attachments/assets/b4107247-7497-4015-bc00-36de91873ed6)
+
 
 
 ### Sign Language Integration
 - Converts speech to sign language using on-screen avatars, aiding individuals with hearing impairments.
 selecting images of Sign language for further prediction 
-![image](https://github.com/user-attachments/assets/574da6a3-7c2e-4a0e-afd2-26363784ef4c)
+![image](https://github.com/user-attachments/assets/b5bda192-8847-416c-bdb3-e785cf60ccac)
+
 
 
 predicted text based on the Sign language and its corresponding speech 
-![image](https://github.com/user-attachments/assets/8f0b01ca-b90f-4c48-91d5-1296ad98796f)
+![image](https://github.com/user-attachments/assets/9b068191-aea9-42b6-b7ea-5d86333b970c)
+
 
 
 
 real time prediction of Sign Language 
-![Uploading image.png…]()
+![image](https://github.com/user-attachments/assets/d608a598-82b6-47b6-a1ef-3607ee90985b)
+
 
 
 
 ### Filler Removal
 - Detects and removes unnecessary fillers (e.g., "um," "uh") from speech to enhance clarity.
 
-![image](https://github.com/user-attachments/assets/ae61b044-d594-4bce-aeac-1cbe3ec7791a)
+![image](https://github.com/user-attachments/assets/4aa611f0-b96f-45cd-a678-71dc2de32d93)
 
 
 ### Audio Handling and Conversion
