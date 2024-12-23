@@ -95,7 +95,7 @@ This project was collaboratively developed by:
 
 
 Below Given is the Video demonstrating the project Articulate :
-[![Watch the video](
+[![Watch the video](https://github.com/sai-darshan-k/Speech_project/blob/main/Articulate_Demo.mp4)]
 
 
 
