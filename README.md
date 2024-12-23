@@ -95,8 +95,7 @@ This project was collaboratively developed by:
 
 
 Below Given is the Video demonstrating the project Articulate :
-[![Watch the video]
-(https://drive.google.com/file/d/1SlGRdXSyB3Pc_zW5AZonZ7K-WsDU1aSF/view?usp=sharing)
+[![Watch the video](
 
 
 
