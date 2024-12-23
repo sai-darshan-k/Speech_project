@@ -92,3 +92,12 @@ This project was collaboratively developed by:
 - **Suhas S**
 
 ---
+
+
+Below Given is the Video demonstrating the project Articulate :
+https://drive.google.com/file/d/1SlGRdXSyB3Pc_zW5AZonZ7K-WsDU1aSF/view?usp=sharing
+
+
+
+
+
